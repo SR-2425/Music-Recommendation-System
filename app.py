@@ -15,10 +15,12 @@ try:
     with open('model/scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
     df = pd.read_csv("model/dataset.csv")
-except FileNotFoundError:
-    raise Exception("❌ Required files not found.")
+except FileNotFoundError as e:
+    raise Exception("❌ Required model or dataset file not found.") from e
+except Exception as e:
+    raise Exception(f"❌ Unexpected error loading files: {e}") from e
 
-# Clean text
+# Clean text (reserved for future use)
 def clean_text(text):
     text = str(text).lower()
     return re.sub(r'[^a-z0-9\s]', '', text)
@@ -71,7 +73,7 @@ def suggest():
     suggestions = df[df['track_name'].str.lower().str.contains(query, na=False)]['track_name'].unique().tolist()
     return jsonify({'suggestions': suggestions[:10]})
 
-# ✅ Final fix for Render: Bind to 0.0.0.0 and use dynamic port
+# ✅ Final Render deployment fix
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 10000))  # Use Render's dynamic port
     app.run(host='0.0.0.0', port=port, debug=True)
