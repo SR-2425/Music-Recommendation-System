@@ -4,6 +4,7 @@ from sklearn.neighbors import NearestNeighbors
 import pickle
 import re
 import urllib.parse
+import os
 
 app = Flask(__name__)
 
@@ -70,5 +71,7 @@ def suggest():
     suggestions = df[df['track_name'].str.lower().str.contains(query, na=False)]['track_name'].unique().tolist()
     return jsonify({'suggestions': suggestions[:10]})
 
+# ✅ Final fix for Render: Bind to 0.0.0.0 and use dynamic port
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port, debug=True)
